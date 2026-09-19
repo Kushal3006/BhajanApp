@@ -7,15 +7,15 @@ import {
   toggleFavoriteId,
 } from "@/lib/storage";
 
-export default function FavoriteButton({ bhajanId, compact = false }) {
+export default function FavoriteButton({ bhajan, compact = false }) {
   const isFavorite = useSyncExternalStore(
     subscribeToStorageChanges,
-    () => isBhajanFavorite(bhajanId),
+    () => isBhajanFavorite(bhajan.id),
     () => false
   );
 
   const handleToggle = async () => {
-    await toggleFavoriteId(bhajanId);
+    await toggleFavoriteId(bhajan.id, bhajan);
   };
 
   return (

@@ -12,6 +12,7 @@ const MIGRATION_VERSION = "1";
 
 const snapshot = {
   favorites: [],
+  favoriteBhajans: [],
   downloads: [],
   language: "en",
 };
@@ -29,21 +30,21 @@ function readLegacyValue(key, fallback) {
     return fallback;
   }
 
-  function readLegacyString(key, fallback = "") {
-    if (!isBrowser()) {
-      return fallback;
-    }
-
-    try {
-      return window.localStorage.getItem(key) || fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
   try {
     const rawValue = window.localStorage.getItem(key);
     return rawValue ? JSON.parse(rawValue) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function readLegacyString(key, fallback = "") {
+  if (!isBrowser()) {
+    return fallback;
+  }
+
+  try {
+    return window.localStorage.getItem(key) || fallback;
   } catch {
     return fallback;
   }
@@ -77,9 +78,40 @@ function normalizeDownloads(downloads) {
       descriptionHi: bhajan.descriptionHi || "",
       descriptionGu: bhajan.descriptionGu || "",
       lyrics: Array.isArray(bhajan.lyrics) ? bhajan.lyrics : [],
-      lyricsEn: Array.isArray(bhajan.lyricsEn) ? bhajan.lyricsEn : [],
-      lyricsHi: Array.isArray(bhajan.lyricsHi) ? bhajan.lyricsHi : [],
-      lyricsGu: Array.isArray(bhajan.lyricsGu) ? bhajan.lyricsGu : [],
+      lyricsEn: bhajan.lyricsEn || "",
+      lyricsHi: bhajan.lyricsHi || "",
+      lyricsGu: bhajan.lyricsGu || "",
+      audioUrl: bhajan.audioUrl || "",
+    }));
+}
+
+function normalizeBhajanMetadata(bhajans) {
+  if (!Array.isArray(bhajans)) {
+    return [];
+  }
+
+  return bhajans
+    .filter((bhajan) => bhajan && bhajan.id != null)
+    .map((bhajan) => ({
+      id: bhajan.id,
+      slug: bhajan.slug || "",
+      title: bhajan.title || "",
+      titleEn: bhajan.titleEn || "",
+      titleHi: bhajan.titleHi || "",
+      titleGu: bhajan.titleGu || "",
+      deity: bhajan.deity || "",
+      category: bhajan.category || "",
+      thumbnail: bhajan.thumbnail || "",
+      duration: bhajan.duration || "",
+      language: bhajan.language || "",
+      description: bhajan.description || "",
+      descriptionEn: bhajan.descriptionEn || "",
+      descriptionHi: bhajan.descriptionHi || "",
+      descriptionGu: bhajan.descriptionGu || "",
+      lyrics: Array.isArray(bhajan.lyrics) ? bhajan.lyrics : [],
+      lyricsEn: bhajan.lyricsEn || "",
+      lyricsHi: bhajan.lyricsHi || "",
+      lyricsGu: bhajan.lyricsGu || "",
       audioUrl: bhajan.audioUrl || "",
     }));
 }
@@ -161,6 +193,10 @@ async function initializeStorage() {
     const database = await openDatabase();
     const migrationVersion = await readDatabaseValue(database, MIGRATION_KEY);
     const storedFavorites = await readDatabaseValue(database, "favorites");
+    const storedFavoriteBhajans = await readDatabaseValue(
+      database,
+      "favoriteBhajans"
+    );
     const storedDownloads = await readDatabaseValue(database, "downloads");
     const storedLanguage = await readDatabaseValue(database, "language");
 
@@ -169,6 +205,9 @@ async function initializeStorage() {
       shouldMigrate && legacyFavorites.length > 0
         ? legacyFavorites
         : storedFavorites || []
+    );
+    snapshot.favoriteBhajans = normalizeBhajanMetadata(
+      storedFavoriteBhajans || []
     );
     snapshot.downloads = normalizeDownloads(
       shouldMigrate && legacyDownloads.length > 0
@@ -183,6 +222,7 @@ async function initializeStorage() {
 
     await writeDatabaseValues(database, {
       favorites: snapshot.favorites,
+      favoriteBhajans: snapshot.favoriteBhajans,
       downloads: snapshot.downloads,
       language: snapshot.language,
       [MIGRATION_KEY]: MIGRATION_VERSION,
@@ -190,6 +230,7 @@ async function initializeStorage() {
   } catch {
     // The in-memory snapshot keeps the app usable if browser storage is blocked.
     snapshot.favorites = legacyFavorites;
+    snapshot.favoriteBhajans = [];
     snapshot.downloads = legacyDownloads;
     snapshot.language = legacyLanguage;
   }
@@ -236,16 +277,40 @@ export function getFavoriteIds() {
   return snapshot.favorites;
 }
 
-export async function toggleFavoriteId(id) {
+export async function toggleFavoriteId(id, bhajan) {
   const normalizedId = String(id);
   const hasFavorite = snapshot.favorites.includes(normalizedId);
   snapshot.favorites = hasFavorite
     ? snapshot.favorites.filter((favoriteId) => favoriteId !== normalizedId)
     : [...snapshot.favorites, normalizedId];
 
-  await persist({ favorites: snapshot.favorites });
+  if (hasFavorite) {
+    snapshot.favoriteBhajans = snapshot.favoriteBhajans.filter(
+      (favorite) => String(favorite.id) !== normalizedId
+    );
+  } else if (bhajan) {
+    const normalizedBhajan = normalizeBhajanMetadata([bhajan])[0];
+    if (normalizedBhajan) {
+      snapshot.favoriteBhajans = [
+        normalizedBhajan,
+        ...snapshot.favoriteBhajans.filter(
+          (favorite) => String(favorite.id) !== normalizedId
+        ),
+      ];
+    }
+  }
+
+  await persist({
+    favorites: snapshot.favorites,
+    favoriteBhajans: snapshot.favoriteBhajans,
+  });
   emitChange();
   return snapshot.favorites;
+}
+
+export function getFavoriteBhajans() {
+  ensureInitialized();
+  return snapshot.favoriteBhajans;
 }
 
 export function getDownloadedBhajans() {

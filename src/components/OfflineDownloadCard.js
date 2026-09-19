@@ -10,6 +10,7 @@ export default function OfflineDownloadCard({ bhajan }) {
   const { language } = useLanguage();
   const localizedBhajan = getLocalizedBhajan(bhajan, language);
   const [audioSource, setAudioSource] = useState(bhajan.audioUrl || "");
+  const [isAudioAvailable, setIsAudioAvailable] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -18,10 +19,13 @@ export default function OfflineDownloadCard({ bhajan }) {
       .then((offlineUrl) => {
         if (isMounted && offlineUrl) {
           setAudioSource(offlineUrl);
+          setIsAudioAvailable(true);
         }
       })
       .catch(() => {
-        // The card can still use the remote URL when local resolution is unavailable.
+        if (isMounted) {
+          setIsAudioAvailable(false);
+        }
       });
 
     return () => {
@@ -51,9 +55,15 @@ export default function OfflineDownloadCard({ bhajan }) {
           <h2 className="text-xl font-bold text-stone-900">{localizedBhajan.title}</h2>
           <p className="text-sm text-stone-600">{bhajan.deity}</p>
         </Link>
-        <audio controls preload="metadata" className="w-full" src={audioSource}>
-          Your browser does not support the audio element.
-        </audio>
+        {isAudioAvailable ? (
+          <audio controls preload="metadata" className="w-full" src={audioSource}>
+            Your browser does not support the audio element.
+          </audio>
+        ) : (
+          <p className="text-sm text-rose-600">
+            Offline audio is unavailable. Connect to the internet and download it again.
+          </p>
+        )}
       </div>
     </article>
   );

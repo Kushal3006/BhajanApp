@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const config = {
   appId: "com.bhakti.devotional",
   appName: "Bhakti",

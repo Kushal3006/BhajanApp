@@ -101,7 +101,7 @@ export default function BhajanDetail({ bhajan }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FavoriteButton bhajanId={bhajan.id} />
+                  <FavoriteButton bhajan={bhajan} />
                   <DownloadButton bhajan={bhajan} />
                 </div>
               </div>

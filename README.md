@@ -51,10 +51,23 @@ Then run:
 
 ```bash
 npx cap sync android
-npx cap run android --prod
+npx cap run android
 ```
 
-Do not use `localhost` in `CAPACITOR_SERVER_URL` for a physical phone. Use the deployed HTTPS domain or a computer LAN address for local testing.
+Capacitor 7 does not support the `--prod` flag. Do not use `localhost` in
+`CAPACITOR_SERVER_URL` for a physical phone. Use the deployed HTTPS domain or
+a computer LAN address for local testing.
+
+Android builds require Java 21 because the Capacitor Filesystem plugin uses a
+Java 21 toolchain. Set `JAVA_HOME` to your JDK 21 installation before running
+the Android build:
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+$env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:Path"
+npx cap run android
+```
 
 ## Database commands
 

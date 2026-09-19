@@ -6,7 +6,11 @@ import {
   subscribeToStorageChanges,
   toggleDownloadedBhajan,
 } from "@/lib/storage";
-import { downloadAudioFile, removeAudioFile } from "@/lib/offlineAudio";
+import {
+  downloadAudioFile,
+  getOfflineAudioUrl,
+  removeAudioFile,
+} from "@/lib/offlineAudio";
 
 export default function DownloadButton({ bhajan, compact = false }) {
   const isDownloaded = useSyncExternalStore(
@@ -26,6 +30,10 @@ export default function DownloadButton({ bhajan, compact = false }) {
         await removeAudioFile(bhajan.id);
       } else {
         await downloadAudioFile(bhajan);
+        const offlineUrl = await getOfflineAudioUrl(bhajan.id);
+        if (!offlineUrl) {
+          throw new Error("The audio file could not be saved for offline use.");
+        }
       }
 
       await toggleDownloadedBhajan(bhajan);

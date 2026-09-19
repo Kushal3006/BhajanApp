@@ -5,7 +5,11 @@ import { useSyncExternalStore } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { bhajanCatalog } from "@/data/bhajans";
 import { getLocalizedBhajan } from "@/lib/localizedContent";
-import { getFavoriteIds, subscribeToStorageChanges } from "@/lib/storage";
+import {
+  getFavoriteBhajans,
+  getFavoriteIds,
+  subscribeToStorageChanges,
+} from "@/lib/storage";
 
 export default function FavoritesPage() {
   const { t, language } = useLanguage();
@@ -14,10 +18,21 @@ export default function FavoritesPage() {
     getFavoriteIds,
     () => []
   );
-
-  const favorites = bhajanCatalog.filter((bhajan) =>
-    favoriteIds.includes(String(bhajan.id))
+  const favoriteBhajans = useSyncExternalStore(
+    subscribeToStorageChanges,
+    getFavoriteBhajans,
+    () => []
   );
+
+  const catalogById = new Map(
+    bhajanCatalog.map((bhajan) => [String(bhajan.id), bhajan])
+  );
+  const storedById = new Map(
+    favoriteBhajans.map((bhajan) => [String(bhajan.id), bhajan])
+  );
+  const favorites = favoriteIds
+    .map((id) => storedById.get(String(id)) || catalogById.get(String(id)))
+    .filter(Boolean);
 
   return (
     <main className="min-h-screen bg-stone-50 px-4 pb-24 pt-10 md:px-8">
