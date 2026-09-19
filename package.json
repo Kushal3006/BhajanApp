@@ -2,22 +2,40 @@
   "name": "bhakti-app",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio",
+    "mobile:sync": "cap sync",
+    "mobile:open": "cap open android",
+    "mobile:run": "cap run android"
   },
   "dependencies": {
-    "next": "16.3.5",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/filesystem": "^7.1.8",
+    "@prisma/client": "^6.16.2",
+    "@supabase/supabase-js": "^2.57.4",
+    "next": "^15.5.25",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
     "@tailwindcss/postcss": "^4",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "prisma": "^6.16.2",
     "tailwindcss": "^4"
   }
 }

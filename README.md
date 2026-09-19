@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Bhakti
 
-## Getting Started
+Bhakti is a devotional bhajan application built with Next.js, Supabase PostgreSQL, Prisma, Supabase Storage, and Capacitor for Android.
 
-First, run the development server:
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Production deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Configure these environment variables in the deployment platform:
 
-## Learn More
+```env
+DATABASE_URL=
+DIRECT_URL=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_STORAGE_AUDIO_BUCKET=audio
+SUPABASE_STORAGE_IMAGE_BUCKET=images
+ADMIN_EMAILS=
+```
 
-To learn more about Next.js, take a look at the following resources:
+Deploy with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Prisma Client is generated automatically by the `postinstall` script. After deployment, verify the database connection:
 
-## Deploy on Vercel
+```text
+https://your-domain.com/api/health
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Android production server
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set the deployed HTTPS URL before syncing Capacitor:
+
+```env
+CAPACITOR_SERVER_URL="https://your-domain.com"
+```
+
+Then run:
+
+```bash
+npx cap sync android
+npx cap run android --prod
+```
+
+Do not use `localhost` in `CAPACITOR_SERVER_URL` for a physical phone. Use the deployed HTTPS domain or a computer LAN address for local testing.
+
+## Database commands
+
+```bash
+npm run db:generate
+npm run db:push
+npm run db:seed
+npm run db:studio
+```
+
+## Capacitor commands
+
+```bash
+npm run mobile:sync
+npm run mobile:open
+npm run mobile:run
+```

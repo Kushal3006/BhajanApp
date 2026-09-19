@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bhajans   Bhajan[]
+}
+
+model Bhajan {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  titleEn     String?
+  titleHi     String?
+  titleGu     String?
+  deity       String
+  language    String        @default("Hindi")
+  description String?
+  descriptionEn String?
+  descriptionHi String?
+  descriptionGu String?
+  lyrics      String
+  lyricsEn    String?
+  lyricsHi    String?
+  lyricsGu    String?
+  audioUrl    String?
+  thumbnailUrl String?
+  duration    String?
+  status      ContentStatus @default(DRAFT)
+  featured    Boolean       @default(false)
+  categoryId  String
+  category    Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  favorites   Favorite[]
+  downloads   Download[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([deity])
+  @@index([title])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  bhajanId  String
+  createdAt DateTime @default(now())
+  bhajan    Bhajan   @relation(fields: [bhajanId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bhajanId])
+  @@index([userId])
+}
+
+model Download {
+  id        String   @id @default(cuid())
+  userId    String
+  bhajanId  String
+  createdAt DateTime @default(now())
+  bhajan    Bhajan   @relation(fields: [bhajanId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bhajanId])
+  @@index([userId])
+}

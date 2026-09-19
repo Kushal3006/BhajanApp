@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f5f1;
+  --foreground: #1f2937;
 }
 
 @theme inline {
@@ -12,15 +12,80 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+button,
+a {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  nav[class*="fixed"][class*="bottom-0"] {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+.admin-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid #e7e5e4;
+  background: #fafaf9;
+  padding: 0.75rem 1rem;
+  color: #292524;
+  outline: none;
+}
+
+.admin-input:focus {
+  border-color: #fbbf24;
+  background: #ffffff;
 }

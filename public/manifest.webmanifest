@@ -1,0 +1,20 @@
+{
+  "name": "Bhakti - Devotional Bhajans",
+  "short_name": "Bhakti",
+  "description": "Listen to bhajans, aartis, mantras, chalisa and stotras online or offline.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f5f1",
+  "theme_color": "#d97706",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "categories": ["music", "lifestyle", "spirituality"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
