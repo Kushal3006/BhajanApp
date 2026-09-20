@@ -31,6 +31,8 @@ const emptyForm = {
 function requestOptions(accessToken, options = {}) {
   return {
     ...options,
+    cache: "no-store",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + accessToken,
@@ -225,6 +227,43 @@ export default function AdminDashboard() {
       }
 
       setMessage(`Bhajan marked ${status.toLowerCase()}.`);
+      await loadDashboard(accessToken);
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  }
+
+  async function deleteBhajan(bhajan) {
+    const confirmed = window.confirm(
+      `Delete "${bhajan.title}" permanently? This cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await fetch(
+        `/api/admin/bhajans/${bhajan.id}`,
+        requestOptions(accessToken, {
+          method: "DELETE",
+        })
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to delete bhajan.");
+      }
+
+      if (form.id === bhajan.id) {
+        setForm(emptyForm);
+        setUploadedMedia({ audio: "", image: "" });
+      }
+
+      setMessage("Bhajan deleted.");
       await loadDashboard(accessToken);
     } catch (requestError) {
       setError(requestError.message);

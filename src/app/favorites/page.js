@@ -2,82 +2,61 @@
 
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
+import BhajanCard from "@/components/BhajanCard";
 import { useLanguage } from "@/components/LanguageProvider";
-import { bhajanCatalog } from "@/data/bhajans";
-import { getLocalizedBhajan } from "@/lib/localizedContent";
-import {
-  getFavoriteBhajans,
-  getFavoriteIds,
-  subscribeToStorageChanges,
-} from "@/lib/storage";
+import { getFavoriteBhajans, subscribeToStorageChanges } from "@/lib/storage";
 
 export default function FavoritesPage() {
-  const { t, language } = useLanguage();
-  const favoriteIds = useSyncExternalStore(
-    subscribeToStorageChanges,
-    getFavoriteIds,
-    () => []
-  );
-  const favoriteBhajans = useSyncExternalStore(
+  const { t } = useLanguage();
+  const favorites = useSyncExternalStore(
     subscribeToStorageChanges,
     getFavoriteBhajans,
     () => []
   );
 
-  const catalogById = new Map(
-    bhajanCatalog.map((bhajan) => [String(bhajan.id), bhajan])
-  );
-  const storedById = new Map(
-    favoriteBhajans.map((bhajan) => [String(bhajan.id), bhajan])
-  );
-  const favorites = favoriteIds
-    .map((id) => storedById.get(String(id)) || catalogById.get(String(id)))
-    .filter(Boolean);
-
   return (
-    <main className="min-h-screen bg-stone-50 px-4 pb-24 pt-10 md:px-8">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex items-center justify-between gap-4">
+    <main className="min-h-screen bg-[#f7f4ee] px-4 pb-28 pt-6 md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">{t.saved}</p>
-            <h1 className="mt-2 text-3xl font-bold text-stone-900">{t.favorites}</h1>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-rose-700">
+              {t.saved}
+            </p>
+            <h1 className="mt-2 text-4xl font-black text-stone-950 md:text-5xl">
+              {t.favorites}
+            </h1>
+            <p className="mt-2 max-w-2xl text-base leading-7 text-stone-600">
+              Bhajans saved for quick daily listening.
+            </p>
           </div>
           <Link
             href="/browse"
-            className="rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-200 hover:text-amber-700"
+            className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-amber-600 px-5 text-sm font-black text-white shadow-sm transition hover:bg-amber-700"
           >
             {t.browse}
           </Link>
         </header>
 
         {favorites.length > 0 ? (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {favorites.map((bhajan) => {
-              const localizedBhajan = getLocalizedBhajan(bhajan, language);
-
-              return <Link
-                key={bhajan.id}
-                href={`/bhajan/${bhajan.slug}`}
-                className="overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-              >
-                <img src={bhajan.thumbnail} alt={localizedBhajan.title} className="h-48 w-full object-cover" />
-                <div className="space-y-3 p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700">
-                      {bhajan.category}
-                    </span>
-                    <span className="text-xs font-medium text-stone-500">{bhajan.duration}</span>
-                  </div>
-                  <h2 className="text-xl font-bold text-stone-900">{localizedBhajan.title}</h2>
-                  <p className="text-sm text-stone-600">{bhajan.deity}</p>
-                </div>
-              </Link>;
-            })}
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {favorites.map((bhajan) => (
+              <BhajanCard key={bhajan.id} bhajan={bhajan} />
+            ))}
           </div>
         ) : (
-          <div className="rounded-[28px] border border-dashed border-stone-300 bg-white p-10 text-center shadow-sm">
-            <p className="text-xl font-semibold text-stone-800">{t.noFavorites}</p>
-            <p className="mt-2 text-stone-600">{t.noFavoritesHint}</p>
+          <div className="rounded-3xl border border-dashed border-stone-300 bg-white p-8 text-center shadow-sm md:p-12">
+            <p className="text-2xl font-black text-stone-900">
+              {t.noFavorites}
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-base leading-7 text-stone-600">
+              {t.noFavoritesHint}
+            </p>
+            <Link
+              href="/browse"
+              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-amber-600 px-6 text-sm font-black text-white"
+            >
+              {t.startListening}
+            </Link>
           </div>
         )}
       </div>

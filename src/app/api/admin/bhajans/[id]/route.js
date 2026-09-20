@@ -1,5 +1,9 @@
 import { assertAdminRequest, adminErrorResponse } from "@/lib/adminAuth";
-import { updateAdminBhajan, updateBhajanStatus } from "@/lib/adminRepository";
+import {
+  deleteAdminBhajan,
+  updateAdminBhajan,
+  updateBhajanStatus,
+} from "@/lib/adminRepository";
 
 export async function PATCH(request, { params }) {
   try {
@@ -12,6 +16,17 @@ export async function PATCH(request, { params }) {
     }
 
     return Response.json(await updateAdminBhajan(id, body));
+  } catch (error) {
+    return adminErrorResponse(error);
+  }
+}
+
+export async function DELETE(request, { params }) {
+  try {
+    await assertAdminRequest(request);
+    const { id } = await params;
+
+    return Response.json(await deleteAdminBhajan(id));
   } catch (error) {
     return adminErrorResponse(error);
   }

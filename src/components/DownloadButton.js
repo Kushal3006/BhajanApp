@@ -52,12 +52,12 @@ export default function DownloadButton({ bhajan, compact = false }) {
         disabled={isBusy}
         className={
           compact
-            ? `rounded-full border px-3 py-2 text-xs font-semibold transition ${
+            ? `min-h-11 rounded-full border px-3 py-2 text-xs font-black transition ${
                 isDownloaded
                   ? "border-emerald-600 bg-emerald-600 text-white"
                   : "border-stone-200 bg-white text-stone-700 hover:border-emerald-200 hover:text-emerald-700"
               }`
-            : `rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
+            : `min-h-12 rounded-2xl border px-4 py-2.5 text-sm font-black transition ${
                 isDownloaded
                   ? "border-emerald-600 bg-emerald-600 text-white"
                   : "border-stone-200 bg-white text-stone-700 hover:border-emerald-200 hover:text-emerald-700"

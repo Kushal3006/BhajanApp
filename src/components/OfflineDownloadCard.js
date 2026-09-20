@@ -34,33 +34,41 @@ export default function OfflineDownloadCard({ bhajan }) {
   }, [bhajan.audioUrl, bhajan.id]);
 
   return (
-    <article className="overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-sm">
+    <article className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
       <Link href={`/bhajan/${bhajan.slug}`} className="block transition hover:opacity-90">
         {bhajan.thumbnail ? (
-          <img src={bhajan.thumbnail} alt={localizedBhajan.title} className="h-48 w-full object-cover" />
+          <img
+            src={bhajan.thumbnail}
+            alt={localizedBhajan.title}
+            className="h-48 w-full object-cover"
+          />
         ) : (
           <div className="flex h-48 items-center justify-center bg-amber-100 text-amber-700">
             Bhakti
           </div>
         )}
       </Link>
-      <div className="space-y-3 p-4">
+      <div className="space-y-4 p-4">
         <div className="flex items-center justify-between gap-2">
-          <span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700">
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-emerald-800">
             Offline
           </span>
-          <span className="text-xs font-medium text-stone-500">{bhajan.duration}</span>
+          <span className="text-sm font-bold text-stone-500">{bhajan.duration}</span>
         </div>
         <Link href={`/bhajan/${bhajan.slug}`} className="block">
-          <h2 className="text-xl font-bold text-stone-900">{localizedBhajan.title}</h2>
-          <p className="text-sm text-stone-600">{bhajan.deity}</p>
+          <h2 className="text-xl font-black leading-snug text-stone-950">
+            {localizedBhajan.title}
+          </h2>
+          <p className="mt-1 text-sm font-semibold text-stone-600">
+            {bhajan.deity}
+          </p>
         </Link>
         {isAudioAvailable ? (
           <audio controls preload="metadata" className="w-full" src={audioSource}>
             Your browser does not support the audio element.
           </audio>
         ) : (
-          <p className="text-sm text-rose-600">
+          <p className="rounded-2xl bg-rose-50 p-3 text-sm font-semibold text-rose-700">
             Offline audio is unavailable. Connect to the internet and download it again.
           </p>
         )}

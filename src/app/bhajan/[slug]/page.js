@@ -5,6 +5,10 @@ import {
   getPublishedBhajans,
 } from "@/lib/bhajanRepository";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const bhajans = await getPublishedBhajans();
   return bhajans.map((bhajan) => ({ slug: bhajan.slug }));

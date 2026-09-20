@@ -7,10 +7,10 @@ export default function MobileNav() {
   const { t } = useLanguage();
 
   const navItems = [
-    { href: "/", label: t.home },
-    { href: "/browse", label: t.browse },
-    { href: "/favorites", label: t.favorites },
-    { href: "/downloads", label: t.downloads },
+    { href: "/", label: t.home, icon: "H" },
+    { href: "/browse", label: t.browse, icon: "B" },
+    { href: "/favorites", label: t.favorites, icon: "S" },
+    { href: "/downloads", label: t.downloads, icon: "O" },
   ];
 
   return (
@@ -20,8 +20,11 @@ export default function MobileNav() {
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-2xl px-2 py-2 text-center text-xs font-semibold text-stone-600 transition hover:bg-stone-100 hover:text-amber-700"
+            className="flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-center text-xs font-bold text-stone-600 transition hover:bg-amber-50 hover:text-amber-800"
           >
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-stone-100 text-[11px] font-black">
+              {item.icon}
+            </span>
             {item.label}
           </Link>
         ))}

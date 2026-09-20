@@ -1,10 +1,15 @@
 import { assertAdminRequest, adminErrorResponse } from "@/lib/adminAuth";
 import { createAdminBhajan, listAdminBhajans } from "@/lib/adminRepository";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(request) {
   try {
     await assertAdminRequest(request);
-    return Response.json(await listAdminBhajans());
+    return Response.json(await listAdminBhajans(), {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     return adminErrorResponse(error);
   }

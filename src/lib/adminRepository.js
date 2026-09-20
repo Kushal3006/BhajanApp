@@ -5,12 +5,20 @@ import {
 
 const allowedStatuses = new Set(["DRAFT", "PUBLISHED", "ARCHIVED"]);
 
+function normalizeSlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function normalizeBhajanInput(input) {
   const titleEn = String(input.titleEn || "").trim();
   const titleHi = String(input.titleHi || "").trim();
   const titleGu = String(input.titleGu || "").trim();
   const title = String(input.title || titleEn || titleHi || titleGu || "").trim();
-  const slug = String(input.slug || "").trim().toLowerCase();
+  const slug = normalizeSlug(input.slug || title);
   const deity = String(input.deity || "").trim();
   const lyricsEn = String(input.lyricsEn || "").trim();
   const lyricsHi = String(input.lyricsHi || "").trim();
@@ -136,6 +144,46 @@ export async function updateBhajanStatus(id, status) {
     data: { status: normalizedStatus },
     include: { category: true },
   });
+}
+
+export async function deleteAdminBhajan(id) {
+  const existingBhajan = await prisma.bhajan.findUnique({
+    where: { id },
+    select: { audioUrl: true, thumbnailUrl: true },
+  });
+
+  if (!existingBhajan) {
+    throw Object.assign(new Error("Bhajan not found."), { status: 404 });
+  }
+
+  await prisma.bhajan.delete({
+    where: { id },
+  });
+
+  const cleanupTasks = [];
+
+  if (existingBhajan.audioUrl) {
+    cleanupTasks.push(
+      deleteStorageObjectFromPublicUrl(existingBhajan.audioUrl, "audio")
+    );
+  }
+
+  if (existingBhajan.thumbnailUrl) {
+    cleanupTasks.push(
+      deleteStorageObjectFromPublicUrl(existingBhajan.thumbnailUrl, "image")
+    );
+  }
+
+  const cleanupResults = await Promise.allSettled(cleanupTasks);
+  const cleanupFailure = cleanupResults.find(
+    (result) => result.status === "rejected"
+  );
+
+  if (cleanupFailure) {
+    console.error("Media cleanup failed after bhajan deletion.", cleanupFailure.reason);
+  }
+
+  return { deleted: true };
 }
 
 export async function createAdminCategory(input) {

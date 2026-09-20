@@ -24,19 +24,19 @@ export default function FavoriteButton({ bhajan, compact = false }) {
       onClick={handleToggle}
       className={
         compact
-          ? `rounded-full border px-3 py-2 text-xs font-semibold transition ${
+          ? `min-h-11 rounded-full border px-3 py-2 text-xs font-black transition ${
               isFavorite
                 ? "border-amber-600 bg-amber-600 text-white"
                 : "border-stone-200 bg-white text-stone-700 hover:border-amber-200 hover:text-amber-700"
             }`
-          : `rounded-full border px-4 py-2.5 text-sm font-semibold transition ${
+          : `min-h-12 rounded-2xl border px-4 py-2.5 text-sm font-black transition ${
               isFavorite
                 ? "border-amber-600 bg-amber-600 text-white"
                 : "border-stone-200 bg-white text-stone-700 hover:border-amber-200 hover:text-amber-700"
             }`
       }
     >
-      {isFavorite ? "Saved" : "Favorite"}
+      {isFavorite ? "Saved" : "Save"}
     </button>
   );
 }

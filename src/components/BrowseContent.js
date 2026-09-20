@@ -31,48 +31,67 @@ export default function BrowseContent({ bhajans, categories }) {
   }, [activeCategory, bhajans, language, searchTerm]);
 
   return (
-    <main className="min-h-screen bg-stone-50 px-4 py-10 md:px-8 lg:px-12">
+    <main className="min-h-screen bg-[#f7f4ee] px-4 pb-28 pt-6 md:px-8 lg:px-12">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">{t.browse}</p>
-            <h1 className="mt-2 text-3xl font-bold text-stone-900 md:text-4xl">{t.bhajansLibrary}</h1>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-amber-700">
+              {t.browse}
+            </p>
+            <h1 className="mt-2 text-4xl font-black text-stone-950 md:text-5xl">
+              {t.bhajansLibrary}
+            </h1>
+            <p className="mt-2 max-w-2xl text-base leading-7 text-stone-600">
+              Search by name or choose a category. Every result opens directly
+              to the player.
+            </p>
           </div>
-          <Link href="/" className="inline-flex items-center justify-center rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-amber-200 hover:text-amber-700">
+          <Link
+            href="/"
+            className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-stone-200 bg-white px-5 text-sm font-black text-stone-700 shadow-sm transition hover:border-amber-200 hover:text-amber-700"
+          >
             {t.backToHome}
           </Link>
         </header>
 
-        <section className="rounded-[28px] bg-white p-4 shadow-sm ring-1 ring-stone-200 md:p-6">
-          <div className="flex flex-col gap-4">
-            <label className="relative block">
-              <span className="sr-only">{t.browse}</span>
-              <input
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder={t.searchPlaceholder}
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-base text-stone-700 outline-none transition focus:border-amber-400 focus:bg-white"
-              />
-            </label>
-            <FilterChips categories={categories} activeCategory={activeCategory} onChange={setActiveCategory} />
+        <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200 md:p-5">
+          <label className="block">
+            <span className="mb-2 block text-sm font-black text-stone-700">
+              Search bhajans
+            </span>
+            <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder={t.searchPlaceholder}
+              className="min-h-14 w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 text-lg font-semibold text-stone-800 outline-none transition focus:border-amber-400 focus:bg-white"
+            />
+          </label>
+          <div className="mt-4">
+            <FilterChips
+              categories={categories}
+              activeCategory={activeCategory}
+              onChange={setActiveCategory}
+            />
           </div>
         </section>
 
         <section className="mt-8">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-stone-900">{t.results}</h2>
-            <span className="rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">
+            <h2 className="text-2xl font-black text-stone-950">{t.results}</h2>
+            <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-black text-amber-800">
               {filteredBhajans.length}
             </span>
           </div>
 
           {filteredBhajans.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredBhajans.map((bhajan) => <BhajanCard key={bhajan.id} bhajan={bhajan} />)}
+              {filteredBhajans.map((bhajan) => (
+                <BhajanCard key={bhajan.id} bhajan={bhajan} />
+              ))}
             </div>
           ) : (
-            <div className="rounded-3xl border border-dashed border-stone-300 bg-white p-10 text-center">
-              <p className="text-lg font-medium text-stone-800">{t.noResults}</p>
+            <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center">
+              <p className="text-xl font-black text-stone-800">{t.noResults}</p>
               <p className="mt-2 text-stone-600">{t.noResultsHint}</p>
             </div>
           )}

@@ -22,7 +22,7 @@ export default function OfflineStatus() {
 
   return (
     <div
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm ${
+      className={`hidden items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold shadow-sm sm:inline-flex ${
         isOnline
           ? "border-emerald-200 bg-emerald-50 text-emerald-700"
           : "border-amber-200 bg-amber-50 text-amber-700"

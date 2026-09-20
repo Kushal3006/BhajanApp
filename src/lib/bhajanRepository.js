@@ -1,5 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
+function normalizeSlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function toBhajanViewModel(bhajan) {
   return {
     id: bhajan.id,
@@ -37,10 +45,15 @@ export async function getPublishedBhajans() {
 }
 
 export async function getPublishedBhajanBySlug(slug) {
-  const bhajan = await prisma.bhajan.findFirst({
-    where: { slug, status: "PUBLISHED" },
+  const normalizedSlug = normalizeSlug(slug);
+  const bhajans = await prisma.bhajan.findMany({
+    where: { status: "PUBLISHED" },
     include: { category: true },
   });
+
+  const bhajan = bhajans.find(
+    (record) => normalizeSlug(record.slug) === normalizedSlug
+  );
 
   return bhajan ? toBhajanViewModel(bhajan) : null;
 }
