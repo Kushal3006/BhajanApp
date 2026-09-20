@@ -1,4 +1,4 @@
-const CACHE_NAME = "bhakti-app-shell-v1";
+const CACHE_NAME = "bhakti-app-shell-v2";
 const APP_SHELL = ["/", "/browse", "/downloads", "/favorites"];
 
 self.addEventListener("install", (event) => {
@@ -27,6 +27,11 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
 
   if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) {
+    return;
+  }
+
+  // API responses, especially admin content, must always come from the server.
+  if (new URL(request.url).pathname.startsWith("/api/")) {
     return;
   }
 

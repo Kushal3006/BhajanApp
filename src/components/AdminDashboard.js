@@ -32,7 +32,6 @@ function requestOptions(accessToken, options = {}) {
   return {
     ...options,
     cache: "no-store",
-    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + accessToken,
@@ -67,17 +66,30 @@ export default function AdminDashboard() {
   );
 
   useEffect(() => {
-    getSupabaseClient()
-      .auth.getSession()
-      .then(({ data }) => {
+    async function initializeAdmin() {
+      try {
+        if ("serviceWorker" in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(
+            registrations.map((registration) => registration.unregister())
+          );
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
+        }
+
+        const { data } = await getSupabaseClient().auth.getSession();
         const session = data.session;
         if (session) {
           setAccessToken(session.access_token);
           setCurrentUser(session.user);
-          loadDashboard(session.access_token);
+          await loadDashboard(session.access_token);
         }
-      })
-      .catch((requestError) => setError(requestError.message));
+      } catch (requestError) {
+        setError(requestError.message);
+      }
+    }
+
+    initializeAdmin();
   }, []);
 
   async function signIn(event) {
@@ -125,8 +137,8 @@ export default function AdminDashboard() {
 
     try {
       const [bhajansResponse, categoriesResponse] = await Promise.all([
-        fetch("/api/admin/bhajans", requestOptions(activeAccessToken)),
-        fetch("/api/admin/categories", requestOptions(activeAccessToken)),
+        fetch(`/api/admin/bhajans?refresh=${Date.now()}`, requestOptions(activeAccessToken)),
+        fetch(`/api/admin/categories?refresh=${Date.now()}`, requestOptions(activeAccessToken)),
       ]);
       const bhajansData = await bhajansResponse.json();
       const categoriesData = await categoriesResponse.json();
@@ -199,6 +211,10 @@ export default function AdminDashboard() {
         throw new Error(data.error || "Unable to save bhajan.");
       }
 
+      setBhajans((current) => [
+        data,
+        ...current.filter((bhajan) => bhajan.id !== data.id),
+      ]);
       setForm(emptyForm);
       setUploadedMedia({ audio: "", image: "" });
       setMessage(form.id ? "Bhajan updated." : "Bhajan created.");
