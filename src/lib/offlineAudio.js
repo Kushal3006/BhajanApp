@@ -1,8 +1,14 @@
 import { Capacitor } from "@capacitor/core";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 
+const AUDIO_CACHE_NAME = "bhakti-offline-audio-v1";
+
 function getAudioPath(bhajanId) {
   return `audio/${String(bhajanId)}.mp3`;
+}
+
+function getWebAudioCacheKey(bhajanId) {
+  return `https://bhakti.local/offline-audio/${String(bhajanId)}`;
 }
 
 function blobToBase64(blob) {
@@ -24,10 +30,6 @@ export function isNativeAudioStorageAvailable() {
 }
 
 export async function downloadAudioFile(bhajan) {
-  if (!isNativeAudioStorageAvailable()) {
-    return null;
-  }
-
   if (!bhajan.audioUrl) {
     throw new Error("This bhajan does not have an audio file.");
   }
@@ -36,6 +38,16 @@ export async function downloadAudioFile(bhajan) {
 
   if (!response.ok) {
     throw new Error(`Audio download failed with status ${response.status}.`);
+  }
+
+  if (!isNativeAudioStorageAvailable()) {
+    if (!("caches" in window)) {
+      throw new Error("Offline audio storage is not available in this browser.");
+    }
+
+    const cache = await window.caches.open(AUDIO_CACHE_NAME);
+    await cache.put(getWebAudioCacheKey(bhajan.id), response.clone());
+    return getWebAudioCacheKey(bhajan.id);
   }
 
   const base64Data = await blobToBase64(await response.blob());
@@ -53,6 +65,10 @@ export async function downloadAudioFile(bhajan) {
 
 export async function removeAudioFile(bhajanId) {
   if (!isNativeAudioStorageAvailable()) {
+    if ("caches" in window) {
+      const cache = await window.caches.open(AUDIO_CACHE_NAME);
+      await cache.delete(getWebAudioCacheKey(bhajanId));
+    }
     return;
   }
 
@@ -71,7 +87,19 @@ export async function removeAudioFile(bhajanId) {
 
 export async function getOfflineAudioUrl(bhajanId) {
   if (!isNativeAudioStorageAvailable()) {
-    return null;
+    if (!("caches" in window)) {
+      return null;
+    }
+
+    const cache = await window.caches.open(AUDIO_CACHE_NAME);
+    const response = await cache.match(getWebAudioCacheKey(bhajanId));
+
+    if (!response) {
+      return null;
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
   }
 
   try {
